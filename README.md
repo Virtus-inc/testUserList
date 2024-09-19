@@ -1,19 +1,19 @@
-## Быстрый старт
+## Quick start
 
-### Требования
+### Requirements
 
 ```
-- node.js > 18 версии
-- Пакетный менеджер yarn (последней версии)
+- node.js > 18 version
+- Correct installation package manager yarn (latest version) via corepack - https://nodejs.org/api/corepack.html
 ```
 
-### Установка зависимостей
+### Installing dependencies
 
 ```
 yarn install
 ```
 
-### Запуск проекта
+### Launch of the project
 
 ```
 yarn dev

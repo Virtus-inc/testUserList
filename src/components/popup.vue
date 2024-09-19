@@ -13,12 +13,7 @@
           <input v-model="user.last_name" type="text" />
           <input v-model="user.email" type="email" />
         </div>
-        <input
-          type="submit"
-          @click="saveChanges"
-          name="submit"
-          value="Зберігти"
-        />
+        <input type="submit" @click="saveChanges" name="submit" value="Save" />
       </div>
     </div>
   </div>
