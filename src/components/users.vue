@@ -11,7 +11,12 @@
       </div>
     </div>
 
-    <popup v-if="isPopupOpen" :user="selectedUser" @close="closePopup" />
+    <popup
+      v-if="isPopupOpen"
+      :user="selectedUser"
+      @close="closePopup"
+      @update="updateUserInList"
+    />
   </div>
 </template>
 
@@ -28,6 +33,7 @@ const fetchUsers = async () => {
     const response = await fetch("https://reqres.in/api/users");
     const data = await response.json();
     users.value = data.data;
+    localStorage.setItem("users", JSON.stringify(users.value));
   } catch (error) {
     console.error("Error fetching users:", error);
   }
@@ -36,13 +42,11 @@ const fetchUsers = async () => {
 const openPopup = (user) => {
   selectedUser.value = user;
   isPopupOpen.value = true;
-  // Добавляем слушатель для закрытия по Esc
   document.addEventListener("keydown", handleEscClose);
 };
 
 const closePopup = () => {
   isPopupOpen.value = false;
-  // Убираем слушатель для закрытия по Esc
   document.removeEventListener("keydown", handleEscClose);
 };
 
@@ -52,8 +56,21 @@ const handleEscClose = (event) => {
   }
 };
 
+const updateUserInList = (updatedUser) => {
+  users.value = users.value.map((user) =>
+    user.id === updatedUser.id ? updatedUser : user
+  );
+  localStorage.setItem("users", JSON.stringify(users.value));
+  closePopup();
+};
+
 onMounted(() => {
-  fetchUsers();
+  const storedUsers = localStorage.getItem("users");
+  if (storedUsers) {
+    users.value = JSON.parse(storedUsers);
+  } else {
+    fetchUsers();
+  }
 });
 
 onUnmounted(() => {

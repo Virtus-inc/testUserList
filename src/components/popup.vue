@@ -13,7 +13,12 @@
           <input v-model="user.last_name" type="text" />
           <input v-model="user.email" type="email" />
         </div>
-        <input type="submit" name="submit" value="Зберігти" />
+        <input
+          type="submit"
+          @click="saveChanges"
+          name="submit"
+          value="Зберігти"
+        />
       </div>
     </div>
   </div>
@@ -26,13 +31,40 @@ const props = defineProps({
   user: Object,
 });
 
-const emit = defineEmits(["close"]);
+const emit = defineEmits(["close", "update"]);
 
 const isPopupVisible = ref(false);
 
 const closePopup = () => {
-  isPopupVisible.value = false;
   emit("close");
+};
+
+const saveChanges = async () => {
+  try {
+    const response = await fetch(
+      `https://reqres.in/api/users/${props.user.id}`,
+      {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          first_name: props.user.first_name,
+          last_name: props.user.last_name,
+          email: props.user.email,
+        }),
+      }
+    );
+
+    if (!response.ok) {
+      throw new Error("Error updating user");
+    }
+
+    const updatedUser = await response.json();
+    emit("update", updatedUser);
+  } catch (error) {
+    console.error("Error updating user:", error);
+  }
 };
 
 const handleClickOutside = (event) => {
@@ -42,7 +74,6 @@ const handleClickOutside = (event) => {
 };
 
 onMounted(() => {
-  // Ожидаем, пока попап откроется, и затем добавляем обработчик
   setTimeout(() => {
     isPopupVisible.value = true;
     document.addEventListener("click", handleClickOutside);
@@ -106,17 +137,13 @@ onUnmounted(() => {
 .popup__title img {
   display: block;
   margin: 1em auto 1em auto;
-  max-width: 100%; /* Убедимся, что изображение не выходит за рамки */
-  height: auto; /* Сохраним пропорции */
+  max-width: 100%;
+  height: auto;
 }
 
 .popup_text {
   display: flex;
   flex-direction: column;
-}
-
-img {
-  border-radius: 7px;
 }
 
 input[type="text"],
